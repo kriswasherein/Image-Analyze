@@ -1,0 +1,138 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>Fluid Mechanics Image Analyzer</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+<header>
+  <div>
+    <h1>Fluid Mechanics Image Analyzer</h1>
+    <p>ImageJ-inspired measurements for experimental fluid mechanics.</p>
+  </div>
+  <div class="header-actions">
+    <button id="openImages">＋ Add image space</button>
+    <button id="exportProject">Export project</button>
+    <button id="exportCSV">Export CSV</button>
+  </div>
+</header>
+
+<input id="fileInput" type="file" accept="image/*,.bmp,.png,.jpg,.jpeg,.tif,.tiff,.webp" multiple hidden>
+
+<main>
+  <aside class="sidebar">
+    <section>
+      <h2>1. Image sequence</h2>
+      <div id="imageList" class="image-list">
+        <div class="empty">Add BMP, PNG, JPG, JPEG, TIFF or WebP images.</div>
+      </div>
+    </section>
+
+    <section>
+      <h2>2. Calibration</h2>
+      <label class="toggle-row">
+        <input id="calibrationMode" type="checkbox">
+        <span>Use selected line as calibration</span>
+      </label>
+      <div id="calibrationBox" class="calibration-box disabled">
+        <label>Known length
+          <input id="calValue" type="number" step="any" placeholder="1.6">
+        </label>
+        <label>Unit
+          <select id="calUnit">
+            <option>mm</option><option>µm</option><option>cm</option>
+            <option>m</option><option>km</option><option>in</option>
+          </select>
+        </label>
+        <div id="scaleReadout">Draw a line on the first image.</div>
+      </div>
+    </section>
+
+    <section>
+      <h2>3. Measurements</h2>
+      <div class="tool-grid">
+        <button data-tool="line">Line</button>
+        <button data-tool="diameter">Diameter</button>
+        <button data-tool="radius">Radius</button>
+        <button data-tool="angle">Angle</button>
+        <button data-tool="area">Area</button>
+        <button data-tool="point">Point</button>
+      </div>
+      <button id="addObject" class="wide">＋ Add object definition</button>
+      <div id="objectList"></div>
+    </section>
+
+    <section>
+      <h2>4. Automatic processing</h2>
+      <label class="toggle-row"><input id="autoTrack" type="checkbox" checked> Track objects in later images</label>
+      <label class="toggle-row"><input id="rgbAssist" type="checkbox" checked> Use RGB/color signature</label>
+      <label class="toggle-row"><input id="edgeAssist" type="checkbox" checked> Use edge/shape assist</label>
+      <button id="processAll" class="wide primary">Process all images</button>
+      <p class="hint">Automatic tracking is an assist, not a substitute for checking the first frame and representative later frames.</p>
+    </section>
+  </aside>
+
+  <section class="workspace">
+    <div class="toolbar">
+      <button id="prevImage">←</button>
+      <span id="imageCounter">No images</span>
+      <button id="nextImage">→</button>
+      <span class="spacer"></span>
+      <button id="zoomOut">−</button><span id="zoomText">100%</span><button id="zoomIn">＋</button>
+      <button id="fitImage">Fit</button>
+    </div>
+
+    <div id="canvasWrap">
+      <canvas id="canvas"></canvas>
+      <div id="dropHint">Drop experimental images here<br><small>or click “Add image space”</small></div>
+    </div>
+
+    <div class="statusbar">
+      <span id="cursorInfo">x: — y: —</span>
+      <span id="pixelInfo">pixel: —</span>
+      <span id="status">Ready</span>
+    </div>
+  </section>
+
+  <aside class="results">
+    <h2>Measurements</h2>
+    <div id="currentResults" class="result-card">
+      <div class="empty">Draw a measurement to see its value.</div>
+    </div>
+    <h2>Batch results</h2>
+    <div class="table-wrap">
+      <table id="resultsTable">
+        <thead><tr><th>Image</th><th>Object</th><th>Type</th><th>Value</th><th>Unit</th><th>Confidence</th></tr></thead>
+        <tbody></tbody>
+      </table>
+    </div>
+  </aside>
+</main>
+
+<div id="objectModal" class="modal hidden">
+  <div class="modal-card">
+    <h2>Define object</h2>
+    <label>Object name <input id="objName" placeholder="Oil drop / water drop / needle / substrate"></label>
+    <label>Measurement type
+      <select id="objType">
+        <option value="diameter">Diameter</option>
+        <option value="radius">Radius</option>
+        <option value="length">Length</option>
+        <option value="angle">Contact angle</option>
+        <option value="area">Area</option>
+        <option value="height">Height</option>
+        <option value="surface">Surface/interface</option>
+        <option value="point">Point/reference</option>
+      </select>
+    </label>
+    <label class="toggle-row"><input id="objMeasure" type="checkbox" checked> Measure this object in subsequent images</label>
+    <label class="toggle-row"><input id="objLock" type="checkbox" checked> Lock definition after drawing</label>
+    <div class="modal-actions"><button id="cancelObj">Cancel</button><button id="saveObj" class="primary">Save</button></div>
+  </div>
+</div>
+
+<script src="app.js"></script>
+</body>
+</html>
